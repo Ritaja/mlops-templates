@@ -2,13 +2,6 @@
 # Licensed under the MIT License.
 
 steps:
-  - task: Bash@3
-    displayName: "Show contents of working directory"
-    inputs:
-      targetType: "inline"
-      script: "ls -alh"
-      workingDirectory: "$(System.DefaultWorkingDirectory)/$(terraform_workingdir)"
-
   - task: TerraformTaskV2@2
     displayName: "Terraform init"
     inputs:
