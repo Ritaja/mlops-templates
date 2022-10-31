@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourcePrefix": {
+            "value": "feathr"
+        },
+        "provisionPurview": {
+            "value": "true"
+        },
+        "provisionEventHub": {
+            "value": "true"
+        },
+        "sqlAdminUsername": {
+            "value": ""
+        },
+        "sqlAdminPassword": {
+            "value": ""
+        },
+        "registryBackend": {
+            "value": "Azure-Purview"
+        },
+        "enableRBAC": {
+            "value": "Yes"
+        },
+        "azureADClientId": {
+            "value": ""
+        },
+        "azureADTenantId": {
+            "value": ""
+        }
+    }
+}
