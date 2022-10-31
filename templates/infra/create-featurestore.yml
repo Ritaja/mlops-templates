@@ -2,12 +2,12 @@
 # Licensed under the MIT License.
 
 parameters:
-  - name: featurestore_sql_username
-    type: string
-    default: "sqladmin"
-  - name: featurestore_sql_password
-    type: string
-    default: "ThisIsNotVerySecure!"
+- name: featurestore_sql_username
+  type: string
+  default: "sqladmin"
+- name: featurestore_sql_password
+  type: string
+  default: "ThisIsNotVerySecure!"
 
 steps:
   - task: AzureCLI@2
