@@ -27,45 +27,6 @@ steps:
         # Define environment variables
         echo "##vso[task.setvariable variable=SUBSCRIPTION_ID]'$SUBSCRIPTION_ID'"
 
-  - task: AzureCLI@2
-    displayName: "AAD app registration steps for the feather app"
-    inputs:
-      azureSubscription: "$(ado_service_connection_rg)"
-      scriptType: "bash"
-      addSpnToEnvironment: true
-      scriptLocation: "inlineScript"
-      inlineScript: |
-        # Use the following configuration command to enable dynamic install of az extensions without a prompt. This is required for the az account command group used in the following steps.
-        az config set extension.use_dynamic_install=yes_without_prompt
-
-        # Please don't change this name, a corresponding webapp with same name gets created in subsequent steps.
-        sitename="${feathrprefix}webapp"
-        echo "sitename set to: $sitename"
-
-        # This will create the Azure AD application, note that we need to create an AAD app of platform type Single Page Application(SPA). By default passing the redirect-uris with create command creates an app of type web. Setting Sign in audience to AzureADMyOrg limits the application access to just your tenant.
-        az ad app create --display-name $sitename --sign-in-audience AzureADMyOrg --web-home-page-url "https://$sitename.azurewebsites.net" --enable-id-token-issuance true
-
-        # It might take a few seconds for the above step to complete, so we wait
-        while [ -z "$aad_clientId" ]; 
-        do
-          # Fetch the ClientId, TenantId and ObjectId for the created app
-          aad_clientId=$(az ad app list --display-name $sitename --query [].appId -o tsv)
-        done
-
-        # We just use the homeTenantId since a user could have access to multiple tenants
-        aad_tenantId=$(az account show --query "[homeTenantId]" -o tsv)
-
-        #Fetch the objectId of AAD app to patch it and add redirect URI in next step.
-        aad_objectId=$(az ad app list --display-name $sitename --query [].id -o tsv)
-
-        # Updating the SPA app created above, currently there is no CLI support to add redirectUris to a SPA, so we have to patch manually via az rest
-        az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/$aad_objectId" --headers "Content-Type=application/json" --body "{spa:{redirectUris:['https://$sitename.azurewebsites.net']}}
-
-        # Define environment variables
-        echo "##vso[task.setvariable variable=AZURE_AAD_OBJECT_ID]'$aad_objectId'"
-        echo "##vso[task.setvariable variable=AAD_CLIENT_ID]'$aad_clientId'"
-        echo "##vso[task.setvariable variable=AZURE_TENANT_ID]'$aad_tenantId'"
-
   - task: AzureResourceManagerTemplateDeployment@3
     displayName: "Create Resources for Feature Store"
     inputs:
@@ -78,7 +39,7 @@ steps:
       templateLocation: "Linked artifact"
       csmFile: "templates/infra/feature_store/azuredeploy.json"
       csmParametersFile: "templates/infra/feature_store/azuredeploy.parameters.json"
-      overrideParameters: "-sqlAdminUsername ${{parameters.featurestore_sql_username}} -sqlAdminPassword ${{parameters.featurestore_sql_password}} -resourcePrefix $(feathrprefix) -azureADClientId $(AAD_CLIENT_ID) -azureADTenantId $(AZURE_TENANT_ID)"
+      overrideParameters: "-sqlAdminUsername ${{parameters.featurestore_sql_username}} -sqlAdminPassword ${{parameters.featurestore_sql_password}} -resourcePrefix $(feathrprefix) -azureADClientId ${{parameters.AAD_CLIENT_ID}} -azureADTenantId ${{parameters.AZURE_TENANT_ID}}"
       deploymentMode: "Complete"
       deploymentName: "Create Resources for Feature Store"
 
