@@ -43,7 +43,7 @@ steps:
       azureResourceManagerConnection: $(ado_service_connection_rg)
       subscriptionId: $(SUBSCRIPTION_ID)
       action: "Create Or Update Resource Group"
-      resourceGroupName: $(terraform_st_resource_group)
+      resourceGroupName: $(resource_group_feature_store)
       location: $(location)
       templateLocation: "Linked artifact"
       csmFile: "templates/infra/feature_store/azuredeploy.json"
