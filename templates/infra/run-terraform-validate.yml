@@ -1,8 +1,5 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-variables:
-  ARM_THREEPOINTZERO_BETA_RESOURCES: true
-
 steps:
   - task: TerraformTaskV2@2
     displayName: "Terraform validate"
